@@ -1,0 +1,22 @@
+{
+  "name": "fuse-block-device",
+  "version": "0.0.0",
+  "description": "A virtual block device backed by FUSE",
+  "main": "index.js",
+  "dependencies": {
+    "fuse-bindings": "^2.11.2",
+    "mkdirp": "^0.5.1",
+    "nanoresource": "^1.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mafintosh/fuse-block-device.git"
+  },
+  "author": "Mathias Buus (@mafintosh)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mafintosh/fuse-block-device/issues"
+  },
+  "homepage": "https://github.com/mafintosh/fuse-block-device"
+}
