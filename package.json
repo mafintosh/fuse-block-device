@@ -1,6 +1,6 @@
 {
   "name": "fuse-block-device",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A virtual block device backed by FUSE",
   "main": "index.js",
   "dependencies": {
