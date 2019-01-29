@@ -25,6 +25,7 @@ class BlockDevice extends Nanoresource {
     this.blockSize = 512
     this.EMPTY = EMPTY
     this.options = opts.options || []
+    this.files = [ this.name ]
 
     this.onread = opts.read
     this.onwrite = opts.write
@@ -42,18 +43,40 @@ class BlockDevice extends Nanoresource {
       force: true,
       options: self.options,
       readdir (path, cb) {
-        if (path === '/') return cb(0, [ self.name ])
+        if (path === '/') return cb(0, self.files)
+        cb(0)
+      },
+      chown (path, uid, gid, cb) {
+        cb(0)
+      },
+      utimens (path, atime, mtime, cb) {
+        cb(0)
+      },
+      truncate (path, size, cb) {
         cb(0)
       },
       getattr (path, cb) {
         if (path === '/') return cb(0, self._stat(100, 0o40755))
         if (path === '/' + self.name) return cb(0, self._stat(self.size, 0o100644))
+        if (hasLock(path)) return cb(0, self._stat(0, 0o100644))
         cb(fuse.ENOENT)
       },
+      create (path, mode, cb) {
+        ops.open(path, mode, cb)
+      },
       open (path, flags, cb) {
-        cb(0, 42) // 42 is an fd
+        if (path === '/' + self.name) return cb(0, 42)
+        if (hasLock(path)) return cb(0, 43)
+
+        if (/\.lck$/.test(path)) {
+          self.files.push(path.split('/').pop())
+          return cb(0, 44)
+        }
+
+        cb(0, fuse.ENOENT)
       },
       read (path, fd, buf, len, pos, cb) {
+        if (hasLock(path)) return cb(0)
         if ((pos & 511) || (len & 511)) return cb(fuse.EINVAL)
         if (!len) return cb(0)
 
@@ -68,6 +91,7 @@ class BlockDevice extends Nanoresource {
         })
       },
       write (path, fd, buf, len, pos, cb) {
+        if (hasLock(path)) return cb(0)
         if ((pos & 511) || (len & 511)) return cb(fuse.EINVAL)
         if (!len) return cb(0)
 
@@ -84,6 +108,10 @@ class BlockDevice extends Nanoresource {
       release (path, fd, cb) {
         cb(0)
       }
+    }
+
+    function hasLock (path) {
+      return /\.lck$/.test(path) && self.files.indexOf(path.slice(1)) > -1
     }
 
     mkdirp(this.mnt, function () {

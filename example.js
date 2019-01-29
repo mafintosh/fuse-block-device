@@ -29,4 +29,11 @@ const blk = blockDevice('./mnt/4gb', {
   }
 })
 
+let max = 0
+setInterval(function () {
+  if (max === blocks.size) return
+  max = blocks.size
+  console.log('Total bytes: ' + blocks.size * 512)
+}, 1000)
+
 process.once('SIGINT', () => blk.close())
