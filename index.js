@@ -79,7 +79,7 @@ class BlockDevice extends Nanoresource {
       read (path, fd, buf, len, pos, cb) {
         if (hasLock(path)) return cb(0)
         if ((pos & 511) || (len & 511)) return cb(fuse.EINVAL)
-        if (!len) return cb(0)
+        if (!len || pos >= self.size) return cb(0)
 
         const blk = pos / 512
         const cnt = len / 512
