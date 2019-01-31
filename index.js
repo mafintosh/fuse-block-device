@@ -16,6 +16,7 @@ class BlockDevice extends Nanoresource {
 
     this.mnt = path.dirname(mnt)
     this.name = path.basename(mnt)
+    this.path = mnt
     this.size = opts.size || 4 * 1024 * 1024 * 1024
     this.ctime = new Date()
     this.mtime = this.ctime
